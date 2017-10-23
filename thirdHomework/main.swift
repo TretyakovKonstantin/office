@@ -1,4 +1,18 @@
 import Foundation
 
-print("Hello, World!")
+class OfficeManager {
+    
+}
 
+class Office {
+    
+}
+
+enum officeProblems: Error {
+    case paymentInvoice
+    case sinkLeakage
+    case mudInTheRoom
+    case cookiesAbsence
+    case newMailInAForeinLanguage
+    case actOfTerrorism
+}
