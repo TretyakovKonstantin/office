@@ -15,7 +15,7 @@ class OfficeManager {
         } catch officeProblems.sinkLeakage {
             Plumber().repairSink(sink: office.sink)
         } catch officeProblems.dirtyOffice {
-            office.cleanOffice(cleaner: Cleaner())
+            Cleaner().clean(dirt: office.dirt)
         } catch officeProblems.paymentInvoice {
             try office.owner.payForOffice(office: office)
         } catch officeProblems.newMailInAForeinLanguage {
@@ -32,10 +32,8 @@ class OfficeManager {
     }
 }
 
-
 class Office {
     private var cookies:[Cookie]?
-    private var dirtLevel = 0
     private var isTerroristAttackHappening = false
     
     private(set) var officeManager:OfficeManager
@@ -43,7 +41,8 @@ class Office {
 
     var mail:Mail?
     var officeDebt:Int = 0
-    var sink: Sink = Sink()
+    var sink = Sink()
+    var dirt = Dirt()
     
     func checkMailLanguage() throws {
         if mail?.language != .russian {
@@ -63,13 +62,8 @@ class Office {
         }
     }
     
-    func cleanOffice(cleaner: Cleaner) {
-        cleaner.clean(office: self)
-        dirtLevel = 0
-    }
-    
     func checkDirtLevel() throws {
-        if dirtLevel > 3 {
+        if dirt.degree > 3 {
             throw officeProblems.dirtyOffice
         }
     }
@@ -122,8 +116,8 @@ class Plumber {
 }
 
 class Cleaner {
-    func clean(office: Office) {
-        return
+    func clean(dirt: Dirt) {
+        dirt.degree = 0
     }
 }
 
@@ -163,3 +157,6 @@ class Sink {
     var isLeaking = false
 }
 
+class Dirt {
+    var degree:Int = 0
+}
