@@ -8,6 +8,7 @@ class OfficeManager {
             try office.checkDirtLevel()
             try office.checkPayments()
             try office.checkTerroristAttack()
+            try office.checkMailLanguage()
         }
         catch officeProblems.cookiesAbsence {
             addCookies(office: office, count: 15)
@@ -18,7 +19,7 @@ class OfficeManager {
         } catch officeProblems.paymentInvoice {
             try office.owner.payForOffice(office: office)
         } catch officeProblems.newMailInAForeinLanguage {
-            Translator().translate(office: office)
+            Translator().translate(mail: office.mail)
         }
     }
     
@@ -39,8 +40,9 @@ class Office {
     private var isSinkWorks = true
     private var dirtLevel = 0
     private var _officeDebt = 0
-    private var terroristAttack = false
+    private var isTerroristAttackHappening = false
     private var _mail:Mail?
+
     
     var officeManager:OfficeManager {
         get {
@@ -72,8 +74,14 @@ class Office {
         }
     }
     
+    func checkMailLanguage() throws {
+        if mail.language != .russian {
+            throw officeProblems.newMailInAForeinLanguage
+        }
+    }
+    
     func checkTerroristAttack() throws {
-        if terroristAttack {
+        if isTerroristAttackHappening {
             throw officeProblems.actOfTerrorism
         }
     }
@@ -165,12 +173,11 @@ class OfficeOwner {
 }
 
 class Translator {
-    func translate(office: Office) {
-        let  mail = office.mail
+    func translate(mail: Mail) {
         guard mail.language != .russian else {
             return
         }
-        office.mail.text? = mail.text! + " Translated"
+        mail.text? = mail.text! + " Translated"
     }
 }
 
