@@ -3,6 +3,7 @@ import Foundation
 class OfficeManager {
     func checkOffice(office: Office) throws {
         try office.getCookiesCount()
+        try office.checkSink()
     }
     
     func addCookies(office: Office, count: Int) {
@@ -18,7 +19,18 @@ class OfficeManager {
 class Office {
     private var officeManager: OfficeManager?
     private var cookies:[Cookie]?
+    var isSinkWorks:Bool = true
     
+    func checkSink() throws {
+        if !isSinkWorks {
+            throw officeProblems.sinkLeakage
+        }
+    }
+    
+    func repairSink(plumber: Plumber) {
+        plumber.repairSink(office: self)
+        isSinkWorks = true
+    }
     
     func getCookiesCount() throws -> (Int) {
         guard cookies != nil && cookies!.count > 0 else {
@@ -43,6 +55,8 @@ class Office {
             try officeManager?.checkOffice(office: self)
         } catch officeProblems.cookiesAbsence {
             officeManager?.addCookies(office: self, count: 15)
+        } catch officeProblems.sinkLeakage {
+            repairSink(plumber: Plumber())
         } catch {
             
         }
@@ -60,4 +74,10 @@ enum officeProblems: Error {
 
 class Cookie {
     
+}
+
+class Plumber {
+    func repairSink(office: Office) {
+        return
+    }
 }
