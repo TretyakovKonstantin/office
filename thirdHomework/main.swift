@@ -24,16 +24,15 @@ class OfficeManager {
     }
     
     func addCookies(office: Office, count: Int) {
-        var newCookies:[Cookie] = []
-        for _ in 0...count {
-            newCookies += [Cookie()]
+        if office.cookies == nil {
+            office.cookies = []
         }
-        office.addCookies(cookies:newCookies)
+        office.cookies! += Array(0...count).map {return Cookie(in:$0)}
     }
 }
 
 class Office {
-    private var cookies:[Cookie]?
+    var cookies:[Cookie]?
     private var isTerroristAttackHappening = false
     
     private(set) var officeManager:OfficeManager
@@ -81,13 +80,6 @@ class Office {
         return cookies!.count
     }
     
-    func addCookies(cookies: [Cookie]) {
-        if self.cookies == nil {
-            self.cookies = []
-        }
-        self.cookies! += cookies
-    }
-    
     init(manager: OfficeManager, owner: OfficeOwner) {
         self.officeManager = manager
         self.owner = owner
@@ -104,7 +96,9 @@ enum officeProblems: Error {
 }
 
 class Cookie {
-    
+    init(in: Int) {
+        
+    }
 }
 
 class Plumber {
