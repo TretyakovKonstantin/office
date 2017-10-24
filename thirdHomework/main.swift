@@ -7,6 +7,7 @@ class OfficeManager {
             try office.checkSink()
             try office.checkDirtLevel()
             try office.checkPayments()
+            try office.checkTerroristAttack()
         }
         catch officeProblems.cookiesAbsence {
             addCookies(office: office, count: 15)
@@ -15,7 +16,9 @@ class OfficeManager {
         } catch officeProblems.dirtyOffice {
             office.cleanOffice(cleaner: Cleaner())
         } catch officeProblems.paymentInvoice {
-            try office.officeOwner?.payForOffice(office: office)
+            try office.owner.payForOffice(office: office)
+        } catch officeProblems.newMailInAForeinLanguage {
+            Translator().translate(office: office)
         }
     }
     
@@ -30,16 +33,48 @@ class OfficeManager {
 
 
 class Office {
-    private var officeManager: OfficeManager?
+    private var _officeManager: OfficeManager?
     private var cookies:[Cookie]?
-    var officeOwner:OfficeOwner?
-    private var isSinkWorks:Bool = true
+    private var _owner:OfficeOwner?
+    private var isSinkWorks = true
     private var dirtLevel = 0
     private var _officeDebt = 0
+    private var terroristAttack = false
+    private var _mail:Mail?
+    
+    var officeManager:OfficeManager {
+        get {
+            return _officeManager!
+        }
+    }
+    
+    var owner:OfficeOwner {
+        get {
+            return _owner!
+        }
+    }
+    
+    var mail:Mail {
+        get {
+            return _mail!
+        }
+        set {
+            _mail = newValue
+        }
+    }
     
     var officeDebt:Int {
         get {
             return _officeDebt
+        }
+        set {
+            _officeDebt = newValue
+        }
+    }
+    
+    func checkTerroristAttack() throws {
+        if terroristAttack {
+            throw officeProblems.actOfTerrorism
         }
     }
     
@@ -85,8 +120,9 @@ class Office {
         self.cookies! += cookies
     }
     
-    init(manager: OfficeManager) {
-        self.officeManager = manager
+    init(manager: OfficeManager, owner: OfficeOwner) {
+        _officeManager = manager
+        _owner = owner
     }
 }
 
@@ -116,14 +152,34 @@ class Cleaner {
 }
 
 class OfficeOwner {
-    var money:Int = 10000
+    var money = 10000
     func payForOffice(office:Office) throws {
         if money >= office.officeDebt {
-        money -= office.officeDebt
-        office.officeDebt == 0
+            money -= office.officeDebt
+            office.officeDebt = 0
         } else {
             throw officeProblems.paymentInvoice
         }
         
+    }
+}
+
+class Translator {
+    func translate(office: Office) {
+        let  mail = office.mail
+        guard mail.language != .russian else {
+            return
+        }
+        office.mail.text? = mail.text! + " Translated"
+    }
+}
+
+class Mail {
+    var text:String?
+    var language = languages.russian
+    
+    enum languages {
+        case russian
+        case english
     }
 }
