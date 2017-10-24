@@ -19,7 +19,7 @@ class OfficeManager {
         } catch officeProblems.paymentInvoice {
             try office.owner.payForOffice(office: office)
         } catch officeProblems.newMailInAForeinLanguage {
-            Translator().translate(mail: office.mail)
+            Translator().translate(mail: office.mail!)
         }
     }
     
@@ -34,48 +34,20 @@ class OfficeManager {
 
 
 class Office {
-    private var _officeManager: OfficeManager?
     private var cookies:[Cookie]?
-    private var _owner:OfficeOwner?
     private var isSinkWorks = true
     private var dirtLevel = 0
-    private var _officeDebt = 0
     private var isTerroristAttackHappening = false
-    private var _mail:Mail?
 
     
-    var officeManager:OfficeManager {
-        get {
-            return _officeManager!
-        }
-    }
-    
-    var owner:OfficeOwner {
-        get {
-            return _owner!
-        }
-    }
-    
-    var mail:Mail {
-        get {
-            return _mail!
-        }
-        set {
-            _mail = newValue
-        }
-    }
-    
-    var officeDebt:Int {
-        get {
-            return _officeDebt
-        }
-        set {
-            _officeDebt = newValue
-        }
-    }
+    private(set) var officeManager:OfficeManager
+    private(set) var owner:OfficeOwner
+
+    var mail:Mail?
+    var officeDebt:Int = 0
     
     func checkMailLanguage() throws {
-        if mail.language != .russian {
+        if mail?.language != .russian {
             throw officeProblems.newMailInAForeinLanguage
         }
     }
@@ -129,8 +101,8 @@ class Office {
     }
     
     init(manager: OfficeManager, owner: OfficeOwner) {
-        _officeManager = manager
-        _owner = owner
+        self.officeManager = manager
+        self.owner = owner
     }
 }
 
@@ -190,3 +162,4 @@ class Mail {
         case english
     }
 }
+
