@@ -13,7 +13,7 @@ class OfficeManager {
         catch officeProblems.cookiesAbsence {
             addCookies(office: office, count: 15)
         } catch officeProblems.sinkLeakage {
-            office.repairSink(plumber: Plumber())
+            Plumber().repairSink(sink: office.sink)
         } catch officeProblems.dirtyOffice {
             office.cleanOffice(cleaner: Cleaner())
         } catch officeProblems.paymentInvoice {
@@ -35,16 +35,15 @@ class OfficeManager {
 
 class Office {
     private var cookies:[Cookie]?
-    private var isSinkWorks = true
     private var dirtLevel = 0
     private var isTerroristAttackHappening = false
-
     
     private(set) var officeManager:OfficeManager
     private(set) var owner:OfficeOwner
 
     var mail:Mail?
     var officeDebt:Int = 0
+    var sink: Sink = Sink()
     
     func checkMailLanguage() throws {
         if mail?.language != .russian {
@@ -76,14 +75,9 @@ class Office {
     }
     
     func checkSink() throws {
-        if !isSinkWorks {
+        if sink.isLeaking {
             throw officeProblems.sinkLeakage
         }
-    }
-    
-    func repairSink(plumber: Plumber) {
-        plumber.repairSink(office: self)
-        isSinkWorks = true
     }
     
     func getCookiesCount() throws -> (Int) {
@@ -120,8 +114,10 @@ class Cookie {
 }
 
 class Plumber {
-    func repairSink(office: Office) {
-        return
+    func repairSink(sink: Sink) {
+        if (sink.isLeaking) {
+            sink.isLeaking = false
+        }
     }
 }
 
@@ -161,5 +157,9 @@ class Mail {
         case russian
         case english
     }
+}
+
+class Sink {
+    var isLeaking = false
 }
 
