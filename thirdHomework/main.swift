@@ -1,6 +1,7 @@
 import Foundation
 
 class OfficeManager {
+    var languagesSpoken:[languages] = [.russian]
     func checkOffice(office: Office) throws {
         do {
             try office.getCookiesCount()
@@ -19,7 +20,11 @@ class OfficeManager {
         } catch officeProblems.paymentInvoice {
             try office.owner.payForOffice(office: office)
         } catch officeProblems.newMailInAForeinLanguage {
-            Translator().translate(mail: office.mail!)
+            guard let translated = Translator().translate(str: office.mail!.text!, language: languages.russian) else {
+                return
+            }
+            office.mail!.text! = translated
+            office.mail!.language = .russian
         }
     }
     
@@ -124,16 +129,16 @@ class OfficeOwner {
         } else {
             throw officeProblems.paymentInvoice
         }
-        
     }
 }
 
 class Translator {
-    func translate(mail: Mail) {
-        guard mail.language != .russian else {
-            return
+    var spokenLanguages: [languages] = [.russian, .english]
+    func translate(str: String, language: languages) -> String? {
+        guard spokenLanguages.contains(language) else {
+            return nil
         }
-        mail.text? = mail.text! + " Translated"
+        return str + " переведено"
     }
 }
 
@@ -141,10 +146,6 @@ class Mail {
     var text:String?
     var language = languages.russian
     
-    enum languages {
-        case russian
-        case english
-    }
 }
 
 class Sink {
@@ -153,4 +154,11 @@ class Sink {
 
 class Dirt {
     var degree:Int = 0
+}
+
+enum languages {
+    case russian
+    case english
+    case spanish
+    case japanese
 }
