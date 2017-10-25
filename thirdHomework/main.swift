@@ -5,11 +5,11 @@ class OfficeManager {
     func checkOffice(office: Office) throws {
         do {
             try office.getCookiesCount()
-            try office.checkSink()
-            try office.checkDirtLevel()
-            try office.checkPayments()
-            try office.checkTerroristAttack()
-            try office.checkMailLanguage()
+            try checkSink(office: office)
+            try checkDirtLevel(office: office)
+            try checkPayments(office: office)
+            try checkTerroristAttack(office: office)
+            try checkMailLanguage(office: office)
         }
         catch officeProblems.cookiesAbsence {
             addCookies(office: office, count: 15)
@@ -32,13 +32,43 @@ class OfficeManager {
         if office.cookies == nil {
             office.cookies = []
         }
-        office.cookies! += Array(0...count).map {return Cookie(in:$0)}
+        office.cookies! += (0...count).map {return Cookie(in:$0)}
+    }
+    
+    func checkMailLanguage(office: Office) throws {
+        if office.mail?.language != .russian {
+            throw officeProblems.newMailInAForeinLanguage
+        }
+    }
+    
+    func checkTerroristAttack(office: Office) throws {
+        if office.isTerroristAttackHappening {
+            throw officeProblems.actOfTerrorism
+        }
+    }
+    
+    func checkPayments(office: Office) throws {
+        if office.officeDebt > 0 {
+            throw officeProblems.paymentInvoice
+        }
+    }
+    
+    func checkDirtLevel(office: Office) throws {
+        if office.dirt.degree > 3 {
+            throw officeProblems.dirtyOffice
+        }
+    }
+    
+    func checkSink(office: Office) throws {
+        if office.sink.isLeaking {
+            throw officeProblems.sinkLeakage
+        }
     }
 }
 
 class Office {
     var cookies:[Cookie]?
-    private var isTerroristAttackHappening = false
+    var isTerroristAttackHappening = false
     
     private(set) var officeManager:OfficeManager
     private(set) var owner:OfficeOwner
@@ -48,37 +78,7 @@ class Office {
     var sink = Sink()
     var dirt = Dirt()
     
-    func checkMailLanguage() throws {
-        if mail?.language != .russian {
-            throw officeProblems.newMailInAForeinLanguage
-        }
-    }
-    
-    func checkTerroristAttack() throws {
-        if isTerroristAttackHappening {
-            throw officeProblems.actOfTerrorism
-        }
-    }
-    
-    func checkPayments() throws {
-        if officeDebt > 0 {
-            throw officeProblems.paymentInvoice
-        }
-    }
-    
-    func checkDirtLevel() throws {
-        if dirt.degree > 3 {
-            throw officeProblems.dirtyOffice
-        }
-    }
-    
-    func checkSink() throws {
-        if sink.isLeaking {
-            throw officeProblems.sinkLeakage
-        }
-    }
-    
-    func getCookiesCount() throws -> (Int) {
+    func getCookiesCount() throws -> Int {
         guard cookies != nil && cookies!.count > 0 else {
             throw officeProblems.cookiesAbsence
         }
@@ -88,6 +88,11 @@ class Office {
     init(manager: OfficeManager, owner: OfficeOwner) {
         self.officeManager = manager
         self.owner = owner
+    }
+    
+    init() {
+        self.officeManager = OfficeManager()
+        self.owner = OfficeOwner()
     }
 }
 
