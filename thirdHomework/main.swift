@@ -20,11 +20,13 @@ class OfficeManager {
         } catch officeProblems.paymentInvoice {
             try office.owner.payForOffice(office: office)
         } catch officeProblems.newMailInAForeinLanguage {
-            guard let translated = Translator().translate(str: office.mail!.text!, language: languages.russian) else {
+            let mail = office.mail!
+            
+            guard !languagesSpoken.contains(mail.language), let translated = Translator().translate(str: office.mail!.text!, language: languages.russian) else {
                 return
             }
-            office.mail!.text! = translated
-            office.mail!.language = .russian
+            mail.text! = translated
+            mail.language = .russian
         }
     }
     
@@ -138,9 +140,9 @@ class OfficeOwner {
 }
 
 class Translator {
-    var spokenLanguages: [languages] = [.russian, .english]
+    var languagesSpoken: [languages] = [.russian, .english]
     func translate(str: String, language: languages) -> String? {
-        guard spokenLanguages.contains(language) else {
+        guard languagesSpoken.contains(language) else {
             return nil
         }
         return str + " переведено"
