@@ -25,7 +25,7 @@ class OfficeManager {
             guard !languagesSpoken.contains(mail.language), let translated = Translator().translate(str: office.mail!.text!, language: languages.russian) else {
                 return
             }
-            mail.text! = translated
+            mail.text = translated
             mail.language = .russian
         }
     }
@@ -34,7 +34,7 @@ class OfficeManager {
         if office.cookies == nil {
             office.cookies = []
         }
-        office.cookies! += (0...count).map {return Cookie(in:$0)}
+        office.cookies! += (0...count).map {Cookie(in:$0)}
     }
     
     func checkMailLanguage(office: Office) throws {
